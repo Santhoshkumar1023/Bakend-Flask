@@ -1,55 +1,58 @@
 
 
-from flask import request, Blueprint
-from flask import jsonify,make_response,request
-from src.db.db import get_db_connection
+# from flask import request, Blueprint
+# from flask import jsonify,make_response,request
 
-from flask.views import MethodView
+# from src.db.db import get_db_connection
 
-import uuid
+# from flask.views import MethodView
 
-user_bluprint=Blueprint('users',__name__)
+# import uuid
 
-class Users(MethodView):
+# user_bluprint=Blueprint('users',__name__)
 
-    # def __init__(self,_id,username,password):
-    #     self.id=_id
-    #     self.username=username
-    #     self.password=password
+# class Users(MethodView):
 
-    def post(self):
-        print("here")
-        try:
-            data=request.get_json()
-           
-            connection = get_db_connection()
-            
-            cursor=connection.cursor()
+#     # def __init__(self,_id,username,password):
+#     #     self.id=_id
+#     #     self.username=username
+#     #     self.password=password
 
-            # query= "CREATE TABLE users (id serial,username VARCHAR(150),password VARCHAR(150) NOT NULL)"
+#     def post(self):
+#         print("here")
+#         try:
+#             data=request.get_json()
 
-            # cursor.execute(query)
+#             connection = get_db_connection()
 
-           
-            # my_id= str(uuid.uuid4())
+#             print(data)
 
-            cursor.execute(("INSERT INTO users(username,password) VALUES(%s,%s)") , (data['username'],data['password']))
+#             cursor=connection.cursor()
 
-            connection.commit()
-        
-            cursor.close()
+#             # query= "CREATE TABLE users (id serial,username VARCHAR(150),password VARCHAR(150) NOT NULL)"
 
-            connection.close()
-            return make_response(jsonify({"message":"success"}),201)
-        except Exception as e:
-            return make_response(jsonify({"message":"failed","error":e}),501)
-         
-
-registration_view = Users.as_view('users')
+#             # cursor.execute(query)
 
 
-user_bluprint.add_url_rule(
-    '/users/create',
-    view_func=registration_view,
-    methods=['POST']
-)
+#             # my_id= str(uuid.uuid4())
+
+#             # cursor.execute(("INSERT INTO users(username,password,email,role,mobileno) VALUES(%s,%s,%s,%s,%s)") , (data['username'],data['password'],data['email'],data['role'],data['mobileno']))
+
+#             connection.session.commit()
+
+#             cursor.close()
+
+#             connection.close()
+#             return make_response(jsonify({"message":"success"}),201)
+#         except Exception as e:
+#             return make_response(jsonify({"message":"failed","error":e}),501)
+
+
+# registration_view = Users.as_view('users')
+
+
+# user_bluprint.add_url_rule(
+#     '/users/create',
+#     view_func=registration_view,
+#     methods=['POST']
+# )
