@@ -40,3 +40,20 @@ def create_user():
         return make_response(jsonify({"status": True, "message": "Successfully Registered!!!"})), 200
     except Exception as e:
         return make_response(jsonify({"status": False, "message": e})), 501
+
+
+@user_blueprint.route('/users', methods=["GET"])
+def get_all_user():
+    try:
+
+        users = db.session.query(Users).all()
+        if users is not None:
+            user_list = [
+                {"username": user.username,
+                 "email": user.email,
+                 "mobil_no": user.mobileno
+                 } for user in users
+            ]
+        return make_response(jsonify({"status": "true", "data": user_list})), 200
+    except Exception as e:
+        return make_response(jsonify({"status": "false", "message": e})), 501
