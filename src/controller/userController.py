@@ -2,7 +2,7 @@ from flask import Blueprint, request, make_response, jsonify
 from src.extension.extension import db
 from src.modal.user import Users
 from werkzeug.security import generate_password_hash
-
+from flask_jwt_extended import jwt_required
 
 user_blueprint = Blueprint("users", __name__)
 
@@ -43,6 +43,7 @@ def create_user():
 
 
 @user_blueprint.route('/users', methods=["GET"])
+@jwt_required()
 def get_all_user():
     try:
 

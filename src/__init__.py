@@ -19,6 +19,8 @@ def create_app():
 def configure_app(app):
     app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:root@localhost:5432/postgres"
     db.init_app(app)
+
+    app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET')
     jwt.init_app(app)
     return None
 
