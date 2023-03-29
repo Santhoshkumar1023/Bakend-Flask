@@ -3,6 +3,7 @@ from flask_cors import CORS
 from src.extension.extension import db, jwt
 from src.controller.userController import user_blueprint
 from src.controller.authController import auth
+from datetime import timedelta
 import os
 
 
@@ -21,6 +22,8 @@ def configure_app(app):
     db.init_app(app)
 
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET')
+    app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=30)
+    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=1)
     jwt.init_app(app)
     return None
 
