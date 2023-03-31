@@ -1,8 +1,8 @@
 from flask import Blueprint, request, make_response, jsonify
-from src.extension.extension import db
-from src.modal.user import Users
+from src.extension.extension import db, bcrypt
+from src.model.user import Users
 from werkzeug.security import generate_password_hash
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 user_blueprint = Blueprint("users", __name__)
 
@@ -24,7 +24,9 @@ def create_user():
         if user is not None:
             return make_response(jsonify({"status": "true", "message": "user already exist"})), 200
 
-        hashed_password = generate_password_hash(data['password'])
+        hashed_password = bcrypt.generate_password_hash(
+            data['password'], 12).decode('utf-8')
+        # hashed_password = generate_password_hash()
 
         user = Users(
             username=data['username'],
@@ -58,3 +60,32 @@ def get_all_user():
         return make_response(jsonify({"status": "true", "data": user_list})), 200
     except Exception as e:
         return make_response(jsonify({"status": "false", "message": e})), 501
+
+
+@user_blueprint.route('/update-password', methods=['PUT'])
+@jwt_required()
+def update_password():
+    try:
+        data = request.get_json()
+
+        password = data['password']
+        old_password = data['old_password']
+
+        email = get_jwt_identity()
+
+        user = Users.query.filter_by(email=email).first()
+
+        if user is not None:
+            if bcrypt.check_password_hash(user.password, old_password):
+                hashed_password = bcrypt.generate_password_hash(
+                    password).decode('utf-8')
+
+                user.password = hashed_password
+
+                db.session.add(user)
+                db.session.commit()
+                return make_response(jsonify({"status": True, "message": "Successsfully updated"})), 200
+            return make_response(jsonify({"status": False, "message": "old password is wrong"}))
+        return make_response(jsonify({"status": False, "message": "user not exist"})), 401
+    except Exception as e:
+        return make_response(jsonify({"status": True, "message": e}))

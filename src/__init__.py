@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from src.extension.extension import db, jwt
+from src.extension.extension import db, jwt, bcrypt
 from src.controller.userController import user_blueprint
 from src.controller.authController import auth
 from datetime import timedelta
@@ -18,19 +18,24 @@ def create_app():
 
 
 def configure_app(app):
+
     app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:root@localhost:5432/postgres"
     db.init_app(app)
 
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=30)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=1)
+
     jwt.init_app(app)
+
+    bcrypt.init_app(app)
+
     return None
 
 
 def register_route(app):
-    app.register_blueprint(user_blueprint)
-    app.register_blueprint(auth)
+    app.register_blueprint(user_blueprint, url_prefix='/api/v1')
+    app.register_blueprint(auth, url_prefix='/api/v1')
     # app.register_blueprint(
     #     user_blueprint)
     return None

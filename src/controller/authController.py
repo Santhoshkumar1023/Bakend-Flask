@@ -1,8 +1,8 @@
-from werkzeug.security import check_password_hash
+
 from flask import Blueprint, make_response, jsonify, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
-from src.modal.user import Users
-
+from src.model.user import Users
+from src.extension.extension import bcrypt, db
 auth = Blueprint('auth', __name__)
 
 
@@ -11,12 +11,14 @@ def login():
     try:
         data = request.get_json()
 
-        email = data['email']
-        password = data['password']
+        email = data["email"]
+        password = data["password"]
 
         user = Users.query.filter_by(email=email).first()
 
-        if user is not None and check_password_hash(user.password, password):
+        print(f'{user}>>>>>>>>>>>>>>')
+
+        if user is not None and bcrypt.check_password_hash(user.password, password):
             access_token = create_access_token(identity=email)
             refresh_token = create_refresh_token(identity=email)
 
@@ -24,15 +26,15 @@ def login():
                 "access_token": access_token,
                 "refresh_token": refresh_token,
                 "user_data": {
-                    "user_name": user.username,
+                    "username": user.username,
                     "email": user.email,
-                    "mobileno": user.mobileno
+                    "mobileno": user.mobileno,
                 }
             }
 
             return make_response(jsonify({"data": response, "message": "Successfully Signedin...!", "status": True})), 200
         return make_response(jsonify({"status": "false", "message": "user not exist"}))
-        # return make_response(jsonify({"mesage": "not signed up"}))
+
     except Exception as e:
         return make_response(jsonify({"message": e}))
 
