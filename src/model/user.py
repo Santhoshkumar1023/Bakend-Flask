@@ -21,3 +21,6 @@ class Users(db.Model):
         self.role = role
         self.mobileno = mobileno
         self.created_at = datetime.datetime.now()
+
+    def __repr__(self):
+        return f'User>>> {self.username} password {self.password}'
